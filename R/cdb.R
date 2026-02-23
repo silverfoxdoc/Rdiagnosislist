@@ -1028,8 +1028,11 @@ exportMiADECDB <- function(CDB, export_folderpath,
 		D <- decompose('Disorder', CDB = createCDB(sampleSNOMED()),
 			SNOMED = sampleSNOMED())
 		CDB <- addComposeLookupToCDB(D, CDB)
-	} 
-	export(CDB$COMPOSELOOKUP, 'compose_lookup.csv')
+	}
+	# Don't export concepts with 'with' (not using)
+	export(CDB$COMPOSELOOKUP[is.na(with), list('rootId', 'attr_1',        'attr_2'        'attr_3'       
+		'attr_4', 'attr_5', 'attr_6', 'attr_7', 'attr_8', 'attr_9',        'attr_10'       'with'         
+		'due_to', 'without', 'origId')], 'compose_lookup.csv')
 	
 	# Blacklist of ignorable concepts not to present as final output 
 	write(as.character(sort(unique(blacklist))),
