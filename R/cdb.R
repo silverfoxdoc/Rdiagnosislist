@@ -1028,15 +1028,21 @@ exportMiADECDB <- function(CDB, export_folderpath,
 			CDB = createCDB(sampleSNOMED()),
 			SNOMED = sampleSNOMED())
 	} else {
-		COMPOSELOOKUP <- CDB$COMPOSELOOKUP
+		# Filter to concepts in the current CDB
+		COMPOSELOOKUP <- CDB$COMPOSELOOKUP[
+			origId %in% CDB$FINDINGS$conceptId]
 	}
 	# For concepts in OVERLAP, create a version of the row with the
-	# mapped finding as the rootId
+	# mapped finding as the rootId and vice versa
 	TEMP <- merge(COMPOSELOOKUP, CDB$OVERLAP[,
 		list(rootId = otherId, findingId)], by = 'rootId')
 	TEMP[, rootId := NULL]
 	setnames(TEMP, 'findingId', 'rootId')
-	COMPOSELOOKUP <- rbind(COMPOSELOOKUP, TEMP)
+	TEMP2 <- merge(COMPOSELOOKUP, CDB$OVERLAP[,
+		list(rootId = findingId, otherId)], by = 'rootId')
+	TEMP2[, rootId := NULL]
+	setnames(TEMP2, 'otherId', 'rootId')
+	COMPOSELOOKUP <- rbind(COMPOSELOOKUP, TEMP, TEMP2)
 	COMPOSELOOKUP <- COMPOSELOOKUP[!duplicated(COMPOSELOOKUP)]
 	# Don't export concepts with 'with' (not using)
 	export(COMPOSELOOKUP[is.na(with), list(rootId, attr_1, attr_2,

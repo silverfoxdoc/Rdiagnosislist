@@ -37,7 +37,11 @@ CDB environment with an additional data.table `COMPOSELOOKUP'
 }
 \description{
 Creates a composition lookup table for a set of SNOMED CT concepts
-based on output of `decompose', and adds it to the CDB
+based on output of `decompose', and adds it to the CDB. The table is
+filtered to include only values of 'origId' which are in the CDB
+FINDINGS table. This allows a compostion lookup based on a different
+SNOMED CT version to be used, as it will be filtered to exclude
+concepts not in the current version.
 }
 \seealso{
 decompose, compose, batchDecompose

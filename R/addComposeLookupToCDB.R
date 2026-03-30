@@ -43,7 +43,11 @@ batchDecompose <- function(conceptIds, CDB, output_filename,
 #' Add composition lookups to CDB
 #'
 #' Creates a composition lookup table for a set of SNOMED CT concepts
-#' based on output of `decompose', and adds it to the CDB
+#' based on output of `decompose', and adds it to the CDB. The table is
+#' filtered to include only values of 'origId' which are in the CDB
+#' FINDINGS table. This allows a compostion lookup based on a different
+#' SNOMED CT version to be used, as it will be filtered to exclude
+#' concepts not in the current version.
 #' 
 #' @param decompositions vector of filenames of decompose output (read
 #'   by fread) or data.frame containing outputs of decompose function
@@ -179,7 +183,8 @@ addComposeLookupToCDB <- function(decompositions, CDB, maxcol = 10,
 		
 	cols_to_keep <- c('rootId', paste0('attr_', 1:maxcol), 
 		'with', 'due_to', 'without', 'origId', 'incl_bodysite')
-	D <- subset(D, select = cols_to_keep)
+	D <- subset(D[origId %in% CDB$FINDINGS$conceptId],
+		select = cols_to_keep)
 	D <- D[!duplicated(D)]
 	setorderv(D, cols_to_keep)
 	setkeyv(D, cols_to_keep)
